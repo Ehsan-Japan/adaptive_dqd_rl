@@ -63,7 +63,7 @@ import os
 
 import numpy as np
 
-from _common import banner, settings
+from _common import banner, settings, torch_device
 
 from adaptive_dqd import policies
 from adaptive_dqd.agents.ppo import PPOAgent, PPOConfig
@@ -75,7 +75,7 @@ from adaptive_dqd.geometry import lines
 
 N_TRAIN, N_TEST = 500, 50
 N_LINES, N_POINTS = 8, 60   # anatomy is read at the largest cell
-DEVICE = "cuda"
+DEVICE = torch_device()
 N_OVERLAYS = 6
 
 DECODER = os.path.join(dv.CHECKPOINTS, f"d_agn_{N_LINES}x{N_POINTS}.pt")

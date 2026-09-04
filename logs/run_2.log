@@ -1,0 +1,10 @@
+
+==========================================================================
+  shared geometry-agnostic decoder
+==========================================================================
+    budget                   8 x 60
+    epochs                   50
+    geometries_per_device    4
+    out                      checkpoints\d_agn_8x60.pt
+
+── device pool: 550 devices (500 train + 50 test) ────────────────────

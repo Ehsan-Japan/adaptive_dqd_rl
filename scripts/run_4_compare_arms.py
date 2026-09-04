@@ -53,7 +53,7 @@ import os
 
 import numpy as np
 
-from _common import banner, settings
+from _common import banner, settings, torch_device
 
 from adaptive_dqd import policies
 from adaptive_dqd.agents.ppo import PPOAgent, PPOConfig
@@ -65,7 +65,7 @@ from adaptive_dqd.eval import compare
 
 N_TRAIN, N_TEST = 500, 50
 MAX_LINES, MAX_POINTS = 8, 60
-DEVICE = "cuda"
+DEVICE = torch_device()
 RUN_ORACLE = True
 TARGET_CELL = (8, 60)          # the ray method's best cell — the bar to clear
 
