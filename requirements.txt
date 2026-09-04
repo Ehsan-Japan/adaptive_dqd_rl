@@ -1,0 +1,11 @@
+# The baseline's stack, unchanged — this project adds no numerical dependency
+# beyond what dqd already needs, on purpose: a second BLAS or a second torch
+# is a second way for two papers' numbers to drift apart.
+torch>=2.0
+numpy>=1.24
+scipy>=1.10
+matplotlib>=3.7
+pillow
+qarray
+python-pptx
+pytest

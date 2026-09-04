@@ -1,0 +1,12 @@
+results/
+checkpoints/
+training_data/
+__pycache__/
+*.pyc
+*.pt
+*.npz
+*.pptx
+*.pdf
+*.docx
+.DS_Store
+.venv/
