@@ -10,3 +10,8 @@ __pycache__/
 *.docx
 .DS_Store
 .venv/
+
+# reduced-pass outputs
+results_fast/
+checkpoints_fast/
+logs/

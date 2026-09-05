@@ -53,7 +53,7 @@ import os
 
 import numpy as np
 
-from _common import banner, settings, torch_device
+from _common import banner, env_int, settings, torch_device
 
 from adaptive_dqd import policies
 from adaptive_dqd.agents.ppo import PPOAgent, PPOConfig
@@ -66,7 +66,12 @@ from adaptive_dqd.eval import compare
 N_TRAIN, N_TEST = 500, 50
 MAX_LINES, MAX_POINTS = 8, 60
 DEVICE = torch_device()
-RUN_ORACLE = True
+RUN_ORACLE = bool(env_int("ADQ_ORACLE", 1))
+# The oracle is n_theta * n_rho decoder passes PER STEP and is over half
+# the cost of this script.  Coarsening its grid weakens the bound it
+# reports (a coarser search can only find a worse best chord), so a
+# headroom number must say which resolution produced it.
+ORACLE_RES = env_int("ADQ_ORACLE_RES", 12)
 TARGET_CELL = (8, 60)          # the ray method's best cell — the bar to clear
 
 DECODER = os.path.join(dv.CHECKPOINTS, f"d_agn_{MAX_LINES}x{MAX_POINTS}.pt")
@@ -77,7 +82,8 @@ OUT = os.path.join(dv.RESULTS, "sweep")
 def main():
     banner("rays vs deep RL — 15 budget cells, same devices, same metric")
     settings(cells=len(compare.BUDGET_GRID), n_test=N_TEST, decoder=DECODER,
-             agent=AGENT, oracle="on" if RUN_ORACLE else "OFF", out=OUT)
+             agent=AGENT, oracle=f"{ORACLE_RES}x{ORACLE_RES}" if RUN_ORACLE else "OFF",
+             out=OUT)
     os.makedirs(OUT, exist_ok=True)
 
     split = dv.load_split(N_TRAIN, N_TEST, MAX_LINES, MAX_POINTS)
@@ -95,7 +101,7 @@ def main():
         "uncertainty_greedy": policies.uncertainty_greedy(),
     }
     if RUN_ORACLE:
-        arms["oracle_greedy"] = policies.oracle_greedy()
+        arms["oracle_greedy"] = policies.oracle_greedy(ORACLE_RES, ORACLE_RES)
 
     idx = list(range(len(grids)))
     all_rows, curves = [], {a: {} for a in arms}

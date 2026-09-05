@@ -15,16 +15,19 @@ deliberately not settable here.
 """
 import os
 
-from _common import banner, settings
+from _common import banner, env_int, settings
 
 from adaptive_dqd.config import devices as dv
 from adaptive_dqd.decoder import agnostic
 from adaptive_dqd.decoder.baseline_net import grid_train
 
 N_TRAIN, N_TEST = 500, 50
+# Subsample the TRAIN side only, after the split, so a reduced pass never
+# moves a device across the split.  0 = use all of them.
+TRAIN_SUBSET = env_int("ADQ_TRAIN_SUBSET", 0)
 N_LINES, N_POINTS = 8, 60
-EPOCHS = 50
-REPEATS = 4           # random geometries per device
+EPOCHS = env_int("ADQ_EPOCHS", 50)
+REPEATS = env_int("ADQ_REPEATS", 4)           # random geometries per device
 SEED = 0
 
 OUT = os.path.join(dv.CHECKPOINTS, f"d_agn_{N_LINES}x{N_POINTS}.pt")
@@ -32,10 +35,16 @@ OUT = os.path.join(dv.CHECKPOINTS, f"d_agn_{N_LINES}x{N_POINTS}.pt")
 if __name__ == "__main__":
     banner("shared geometry-agnostic decoder")
     settings(budget=f"{N_LINES} x {N_POINTS}", epochs=EPOCHS,
+             train_subset=TRAIN_SUBSET or "all",
              geometries_per_device=REPEATS, out=OUT)
 
     split = dv.load_split(N_TRAIN, N_TEST, N_LINES, N_POINTS)
-    grids, truths = dv.load_arrays(split.train_dirs)      # TRAIN ONLY
+    train_dirs = split.train_dirs
+    if TRAIN_SUBSET:
+        train_dirs = train_dirs[:TRAIN_SUBSET]
+        print(f"  REDUCED PASS: {len(train_dirs)} of "
+              f"{len(split.train_dirs)} training devices")
+    grids, truths = dv.load_arrays(train_dirs)            # TRAIN ONLY
     print(f"  {len(grids)} training devices -> "
           f"{len(grids) * REPEATS} random-geometry examples")
 

@@ -151,6 +151,20 @@ def write_table(results: Dict[str, Dict], path: str,
 # The baseline paper's grid, verbatim: 15 cells, 160 to 480 operations.
 BUDGET_GRID = [(r, p) for r in (4, 5, 6, 7, 8) for p in (40, 50, 60)]
 
+# A reduced pass may evaluate a SUBSET of those cells — never a different
+# grid.  $ADQ_CELLS is "4x40,6x50,8x60"; every cell named must already be in
+# BUDGET_GRID, so a short run stays a subset of the paper's sweep and the
+# curve it draws is the same curve with fewer points on it.
+_cells = os.environ.get("ADQ_CELLS")
+if _cells:
+    _want = [tuple(int(v) for v in c.strip().split("x"))
+             for c in _cells.split(",") if c.strip()]
+    _bad = [c for c in _want if c not in BUDGET_GRID]
+    if _bad:
+        raise ValueError(f"$ADQ_CELLS names cells outside the paper's grid: "
+                         f"{_bad}; BUDGET_GRID is {BUDGET_GRID}")
+    BUDGET_GRID = _want
+
 
 def budget_saving(rays_curve, rl_curve, target_ops: int = 8 * 60):
     """

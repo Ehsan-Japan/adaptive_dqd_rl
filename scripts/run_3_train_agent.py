@@ -31,7 +31,7 @@ column is there to distinguish from an agent that simply failed to train.
 import json
 import os
 
-from _common import banner, settings, torch_device
+from _common import banner, env_int, settings, torch_device
 
 from adaptive_dqd.agents.ppo import PPOAgent, PPOConfig
 from adaptive_dqd.config import devices as dv
@@ -41,7 +41,7 @@ from adaptive_dqd.envs import SweepEnv
 
 N_TRAIN, N_TEST = 500, 50
 N_LINES, N_POINTS = 8, 60
-ITERATIONS = 300
+ITERATIONS = env_int("ADQ_ITERATIONS", 300)
 SEED = 0
 DEVICE = torch_device()
 

@@ -30,3 +30,14 @@ def torch_device() -> str:
         return forced
     import torch
     return "cuda" if torch.cuda.is_available() else "cpu"
+
+
+def env_int(name: str, default: int) -> int:
+    """A run-scale knob, overridable from the environment.
+
+    The defaults in these scripts are the protocol and stay the protocol; the
+    override exists so a reduced pass can be run without editing them, and so
+    the reduced pass has to name itself on the command line.
+    """
+    import os
+    return int(os.environ.get(name, default))
